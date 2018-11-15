@@ -242,6 +242,24 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 // Finally, if the node shouldn't be collapsed or if it does not have children, set the node icon.
                 if (!$collapse || $customnode->has_children() == false) {
                     $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
+
+                    // check for custom icon on title
+                    switch (strtolower($customnode->text)) {
+                        case 'progress':
+                            $customnode->icon = new pix_icon('tachometer', '', 'local_boostnavigation');
+                            break;
+                        case 'support team':
+                            $customnode->icon = new pix_icon('id-card', '', 'local_boostnavigation');
+                            break;
+                        case 'classmates':
+                            $customnode->icon = new pix_icon('users-solid', '', 'local_boostnavigation');
+                            break;
+                        case 'course announcements and resources':
+                            $customnode->icon = new pix_icon('book-solid', '', 'local_boostnavigation');
+                            break;
+                        default:
+                            break;
+                    }
                 }
 
                 // Otherwise, if it's a child node.
