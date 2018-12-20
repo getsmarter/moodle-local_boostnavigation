@@ -241,7 +241,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
                 $firstsectionnodekey = $firstsectionnode->key;
 
                 // Create coursesections course node.
-                $coursesectionsnode = navigation_node::create(get_string('sections', 'moodle'),
+                $coursesectionsnode = navigation_node::create(get_string('module_list', 'local_boostnavigation'),
                         new moodle_url('/course/view.php', array('id' => $COURSE->id)), // We have to add a URL to the course node,
                                                                                         // otherwise the node wouldn't be added to
                                                                                         // the flat navigation by Boost.
@@ -597,6 +597,42 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
         // Allow updating the necessary user preferences via Ajax.
         foreach ($collapsenodesforjs as $node) {
             user_preference_allow_ajax_update('local_boostnavigation-collapse_'.$node.'node', PARAM_BOOL);
+        }
+    }
+
+    // Check if admin wanted us to remove participants from the current module.
+    // @TODO - Add settings to covern this if need be
+    if ($coursehomenode) {
+        $coursehomenode->children->remove('participants', navigation_node::TYPE_CONTAINER);
+    } else {
+        $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+        $coursehomenode->children->remove('participants', navigation_node::TYPE_CONTAINER);
+    }
+
+    // Change grades text and icon
+    $gradesnode = $coursehomenode->children->find('grades', global_navigation::TYPE_SETTING);
+    if ($gradesnode) {
+        $gradesnode->text = get_string('my_grades', 'local_boostnavigation');
+        $gradesnode->icon = new pix_icon('trophy-solid', '', 'local_boostnavigation');
+    }
+
+    // Add calendar link after grades icon
+    $calendarnode = navigation_node::create(get_string('calendar', 'calendar'),
+        new moodle_url('/calendar/view.php', array('view' => 'month','course' => $COURSE->id)),
+        global_navigation::TYPE_CUSTOM,
+        null,
+        'calendar',
+        new pix_icon('i/calendar', '')
+    );
+    $coursehomenode->add_node($calendarnode, 'localboostnavigationcoursesections');
+
+    // Add full color folder icon to course section icons
+    if ($coursesectionsnode) {
+        $coursesectionnodes = $coursesectionsnode->parent->find_all_of_type(navigation_node::TYPE_SECTION);
+        if (count($coursesectionnodes)) {
+            foreach($coursesectionnodes as $node) {
+                $node->icon = new pix_icon('i/folder', '');
+            }
         }
     }
 }
