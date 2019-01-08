@@ -23,7 +23,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+require_once($CFG->dirroot . '/theme/legend/lib.php');
 /**
  * Fumble with Moodle's global navigation by leveraging Moodle's *_extend_navigation() hook.
  *
@@ -618,13 +618,17 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
 
     // Add calendar link after grades icon
     $calendarnode = navigation_node::create(get_string('calendar', 'calendar'),
-        new moodle_url('/calendar/view.php', array('view' => 'month','course' => $COURSE->id)),
+        new moodle_url('/calendar/view.php', array('course' => $COURSE->id, 'view' => 'month')),
         global_navigation::TYPE_CUSTOM,
         null,
         'calendar',
         new pix_icon('i/calendar', '')
     );
     $coursehomenode->add_node($calendarnode, 'localboostnavigationcoursesections');
+    $calendarurlcheck = strpos($PAGE->url->out(), 'calendar/view.php?course=' . $COURSE->id);
+    if ($calendarurlcheck) {
+        $calendarnode->isactive = true;
+    }
 
     // Add full color folder icon to course section icons
     if ($coursesectionsnode) {
@@ -634,6 +638,17 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
                 $node->icon = new pix_icon('i/folder', '');
             }
         }
+    }
+
+    // Marking current module node active according url check
+    $currentmodulenode = $PAGE->navigation->find('localboostnavigationcustomcourseusers1', global_navigation::TYPE_CUSTOM);
+    if ($currentmodulenode->text === get_string('current_module', 'local_boostnavigation') && $COURSE->id) {
+        // getting params for current module in active course
+        $currentsection = theme_legend_get_current_section($COURSE);
+        $courseviewurlcheck = strpos($PAGE->url->out(), 'course/view.php?id=' . $COURSE->id);
+        $sectionurlcheck = strpos($PAGE->url->out(), 'section=' . $currentsection['id']);
+
+        $currentmodulenode->isactive = ($courseviewurlcheck && $sectionurlcheck) ? true : false;
     }
 }
 
