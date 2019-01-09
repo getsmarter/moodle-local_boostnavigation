@@ -57,7 +57,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     }
 
     // Check if admin wanted us to remove the calendar node from Boost's nav drawer.
-    if (isset($config->removecalendarnode) && $config->removecalendarnode == true) {
+    if ((isset($config->removecalendarnode) && $config->removecalendarnode == true) || ($COURSE->id != SITEID)) {
         // If yes, do it.
         if ($calendarnode = $navigation->find('calendar', global_navigation::TYPE_CUSTOM)) {
             // Hide calendar node.
@@ -600,8 +600,14 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
         }
     }
 
+    // New admin requirements for new icon/styles/positions.
+    // @TODO - Add settings to covern this if need be.
+
+    /**********************
+     * Course-view settings
+    ***********************/
+
     // Check if admin wanted us to remove participants from the current module.
-    // @TODO - Add settings to covern this if need be
     if ($coursehomenode) {
         $coursehomenode->children->remove('participants', navigation_node::TYPE_CONTAINER);
     } else {
@@ -609,7 +615,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
         $coursehomenode->children->remove('participants', navigation_node::TYPE_CONTAINER);
     }
 
-    // Change grades text and icon
+    // Change course-specific core grades text and icon
     $gradesnode = $coursehomenode->children->find('grades', global_navigation::TYPE_SETTING);
     if ($gradesnode) {
         $gradesnode->text = get_string('my_grades', 'local_boostnavigation');
@@ -650,6 +656,23 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
 
         $currentmodulenode->isactive = ($courseviewurlcheck && $sectionurlcheck) ? true : false;
     }
+
+    /********************
+     * Site-view settings
+    *********************/
+
+    // Add site-wide grade icon
+    $rootgradesnode = navigation_node::create(get_string('my_grades', 'local_boostnavigation'),
+        new moodle_url('/grade/report/overview/index.php'),
+        global_navigation::TYPE_CUSTOM,
+        null,
+        'root_grades',
+        new pix_icon('trophy-solid', '', 'local_boostnavigation')
+    );
+    $rootgradesnode->showinflatnavigation = $COURSE->id == SITEID ? true : false;
+    $navigation->add_node($rootgradesnode, 'home');
+
+    // End of new admin requirements for new icon/styles/positions.
 }
 
 

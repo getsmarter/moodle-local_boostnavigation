@@ -264,7 +264,7 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                             break;
                         case 'current_module':
                             $courseid = $customnode->action->get_param('id');
-                            // Working out selected module's current module and setting in url
+                            // Working out selected module's current module and section in url
                             if ($courseid) {
                                 $course = get_course($courseid);
                                 $currentsection = theme_legend_get_current_section($course);
