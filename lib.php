@@ -619,7 +619,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     $gradesnode = $coursehomenode->children->find('grades', global_navigation::TYPE_SETTING);
     if ($gradesnode) {
         $gradesnode->text = get_string('my_grades', 'local_boostnavigation');
-        $gradesnode->icon = new pix_icon('trophy-solid', '', 'local_boostnavigation');
+        $gradesnode->icon = new pix_icon('t/award', 'award');
     }
 
     // Add calendar link after grades icon
@@ -647,7 +647,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     }
 
     // Marking current module node active according url check
-    $currentmodulenode = $PAGE->navigation->find('localboostnavigationcustomcourseusers1', global_navigation::TYPE_CUSTOM);
+    $currentmodulenode = $PAGE->navigation->find('current_module', global_navigation::TYPE_CUSTOM);
     if ($currentmodulenode->text === get_string('current_module', 'local_boostnavigation') && $COURSE->id) {
         // getting params for current module in active course
         $currentsection = theme_legend_get_current_section($COURSE);
@@ -667,10 +667,20 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
         global_navigation::TYPE_CUSTOM,
         null,
         'root_grades',
-        new pix_icon('trophy-solid', '', 'local_boostnavigation')
+        new pix_icon('t/award', 'award')
     );
     $rootgradesnode->showinflatnavigation = $COURSE->id == SITEID ? true : false;
     $navigation->add_node($rootgradesnode, 'home');
+
+    $homerootnode = navigation_node::create('Home',
+        new moodle_url('/'),
+        global_navigation::TYPE_CUSTOM,
+        null,
+        'home_root',
+        new pix_icon('i/home', 'home')
+    );
+    $homerootnode->showinflatnavigation = true;
+    $navigation->add_node($homerootnode, 'mycourses');
 
     // End of new admin requirements for new icon/styles/positions.
 }

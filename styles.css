@@ -104,3 +104,61 @@
 .jsenabled .list-group-item[data-key^="localboostnavigationcustombottomadmins"][data-isexpandable="1"]:not([data-parent-key^="localboostnavigationcustombottomadmins"]) ~ .list-group-item[data-parent-key^="localboostnavigationcustombottomadmins"] > div {
     margin-left: inherit !important;
 }
+
+/* New boost nav styles */
+/* Note - important styles may be used if needed since we do not have access to the core html */
+#nav-drawer {
+    border-right: 3px solid #ddd;
+}
+
+#nav-drawer[view="courseview"] [data-key="home_root"] {
+    margin-top: 1rem;
+}
+
+.list-group-item.list-group-item-action,
+.list-group-item[data-key="mycourses"] {
+    background-color: #ddd;
+    border-color: #bbb;
+}
+
+.list-group-item.list-group-item-action:hover {
+    background-color: #eee;
+}
+
+.list-group-item.list-group-item-action.active {
+    background-color: #fff;
+    border: none;
+    border-left: 5px solid #767676;
+    padding-left: 1rem;
+}
+
+.list-group-item.list-group-item-action.active::before {
+    /* right arrow for active border */
+    font-family: 'FontAwesome';
+    content: "\f0da";
+    color: #767676;
+    position: absolute;
+    left: -1px;
+    font-size: 1.5rem;
+    top: 5px;
+}
+
+.list-group-item.list-group-item-action[data-key="current_module"] .media-left::before {
+    font-family: 'FontAwesome';
+    content: "\f069";
+    color: #2f2f2f;
+}
+
+.list-group-item.list-group-item-action.active span {
+    color: #767676;
+}
+
+.list-group-item.list-group-item-action span {
+    color: #2f2f2f;
+}
+
+.list-group-item.list-group-item-action[data-key="localboostnavigationcoursesections"],
+.list-group-item[data-key="mycourses"] {
+    margin-top: 1rem;
+}
+/* End of new boost nav styles */

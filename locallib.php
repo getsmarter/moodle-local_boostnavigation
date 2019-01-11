@@ -244,33 +244,33 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                     $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
 
                     // Handle custom node icons, language names and hrefs where applicable.
-                    // @TODO CHANGE TO FA ICONS INSTEAD OF SVG'S
                     switch (strtolower($customnode->text)) {
                         case 'progress':
-                            $customnode->icon = new pix_icon('tachometer', '', 'local_boostnavigation');
+                            $customnode->icon = new pix_icon('i/dashboard', 'dashboard');
                             $customnode->text = get_string('progress', 'local_boostnavigation');
                             break;
                         case 'support_team':
-                            $customnode->icon = new pix_icon('id-card', '', 'local_boostnavigation');
+                            $customnode->icon = new pix_icon('t/addcontact', 'addcontact');
                             $customnode->text = get_string('support_team', 'local_boostnavigation');
                             break;
                         case 'classmates':
-                            $customnode->icon = new pix_icon('users-solid', '', 'local_boostnavigation');
+                            $customnode->icon = new pix_icon('t/cohort', 'cohort');
                             $customnode->text = get_string('classmates', 'local_boostnavigation');
                             break;
                         case 'announcements_and_resources':
-                            $customnode->icon = new pix_icon('flag-solid', '', 'local_boostnavigation');
+                            $customnode->icon = new pix_icon('i/flagged', 'flagged');
                             $customnode->text = get_string('announcements_and_resources', 'local_boostnavigation');
                             break;
                         case 'current_module':
                             $courseid = $customnode->action->get_param('id');
+                            $customnode->key = "current_module";
                             // Working out selected module's current module and section in url
                             if ($courseid) {
                                 $course = get_course($courseid);
                                 $currentsection = theme_legend_get_current_section($course);
                                 $customnode->action->param('section', $currentsection['id']);
                             }
-                            $customnode->icon = new pix_icon('asterisk-solid', '', 'local_boostnavigation');
+                            $customnode->icon = new pix_icon('i/star-rating1', 'star-rating');
                             $customnode->text = get_string('current_module', 'local_boostnavigation');
                             break;
                         default:
