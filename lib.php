@@ -634,6 +634,9 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     $calendarurlcheck = strpos($PAGE->url->out(), 'calendar/view.php?course=' . $COURSE->id);
     if ($calendarurlcheck) {
         $calendarnode->isactive = true;
+        // Marking the additional course node at the bottom as inactive.
+        $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+        $coursehomenode->isactive = false;
     }
 
     // Add full color folder icon to course section icons

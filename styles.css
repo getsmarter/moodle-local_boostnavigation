@@ -109,6 +109,7 @@
 /* Note - important styles may be used if needed since we do not have access to the core html */
 #nav-drawer {
     border-right: 3px solid #ddd;
+    background-color: #fff;
 }
 
 #nav-drawer[view="courseview"] [data-key="home_root"] {
@@ -127,7 +128,7 @@
 
 .list-group-item.list-group-item-action.active {
     background-color: #fff;
-    border: none;
+    border: 1px solid #bbb;
     border-left: 5px solid #767676;
     padding-left: 1rem;
 }
@@ -147,6 +148,14 @@
     font-family: 'FontAwesome';
     content: "\f069";
     color: #2f2f2f;
+}
+
+.list-group-item.list-group-item-action[data-key="current_module"] .media-body {
+    margin-left: 10px;
+}
+
+.list-group-item.list-group-item-action[data-key="current_module"] img {
+    display: none;
 }
 
 .list-group-item.list-group-item-action.active span {
