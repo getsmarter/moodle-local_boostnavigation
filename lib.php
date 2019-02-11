@@ -77,6 +77,9 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     // Next, we will need the mycourses node and the mycourses node children in any case and don't want to fetch them more
     // than once.
     $mycoursesnode = $navigation->find('mycourses', global_navigation::TYPE_ROOTNODE);
+
+    $mycoursesnode->icon = new pix_icon('i/courseevent', ''); //changing icon=
+
     $mycourseschildrennodeskeys = $mycoursesnode->get_children_key_list();
 
     // Check if admin wanted us to remove the mycourses node from Boost's nav drawer.
@@ -250,7 +253,10 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
                         global_navigation::TYPE_CUSTOM,
                         null,
                         'localboostnavigationcoursesections',
-                        null);
+                        null
+                        );
+
+                $coursesectionsnode->icon = new pix_icon('i/open', '');
                 // Prevent that the coursesections course node is marked as active and added to the breadcrumb when showing the
                 // course home page.
                 $coursesectionsnode->make_inactive();
