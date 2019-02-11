@@ -78,14 +78,10 @@
 
 /* Improve node icons. */
 /* Hide the (empty) node icon for heading nodes. */
-.list-group-item[data-key="localboostnavigationcoursesections"] .icon.fa-fw,
 .list-group-item[data-key="localboostnavigationactivities"] .icon.fa-fw {
     display: none;
 }
-/* Hide the icon for the mycourses node ... */
-.list-group-item[data-key="mycourses"] .icon {
-    display: none;
-}
+
 /* ... and remove the indent of the mycourses child nodes. */
 .list-group-item[data-parent-key="mycourses"] > div {
     margin-left: 0 !important;
@@ -166,7 +162,6 @@
     color: #2f2f2f;
 }
 
-.list-group-item.list-group-item-action[data-key="localboostnavigationcoursesections"],
 .list-group-item[data-key="mycourses"] {
     margin-top: 1rem;
 }
