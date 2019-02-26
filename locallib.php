@@ -219,8 +219,8 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                     $customnode->isexpandable = false;
                 }
 
-                // Add the custom node to the given navigation_node.
-                $node->add_node($customnode);
+                // Specify at which key index to add the custom node. Second argument is the key
+                $node->add_node($customnode, 'participants');
 
                 // Remember the node as a potential parent node for the next node.
                 $lastparentnode = $customnode;
@@ -242,6 +242,40 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 // Finally, if the node shouldn't be collapsed or if it does not have children, set the node icon.
                 if (!$collapse || $customnode->has_children() == false) {
                     $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
+
+                    // Handle custom node icons, language names and hrefs where applicable.
+                    switch (strtolower($customnode->text)) {
+                        case 'progress':
+                            $customnode->icon = new pix_icon('i/dashboard', 'dashboard');
+                            $customnode->text = get_string('progress', 'local_boostnavigation');
+                            break;
+                        case 'support_team':
+                            $customnode->icon = new pix_icon('t/addcontact', 'addcontact');
+                            $customnode->text = get_string('support_team', 'local_boostnavigation');
+                            break;
+                        case 'classmates':
+                            $customnode->icon = new pix_icon('t/cohort', 'cohort');
+                            $customnode->text = get_string('classmates', 'local_boostnavigation');
+                            break;
+                        case 'announcements_and_resources':
+                            $customnode->icon = new pix_icon('i/flagged', 'flagged');
+                            $customnode->text = get_string('announcements_and_resources', 'local_boostnavigation');
+                            break;
+                        case 'current_module':
+                            $courseid = $customnode->action->get_param('id');
+                            $customnode->key = "current_module";
+                            // Working out selected module's current module and section in url
+                            if ($courseid) {
+                                $course = get_course($courseid);
+                                $currentsection = theme_legend_get_current_section($course);
+                                $customnode->action->param('section', $currentsection['id']);
+                            }
+                            $customnode->icon = new pix_icon('i/star-rating1', 'star-rating');
+                            $customnode->text = get_string('current_module', 'local_boostnavigation');
+                            break;
+                        default:
+                            break;
+                    }
                 }
 
                 // Otherwise, if it's a child node.

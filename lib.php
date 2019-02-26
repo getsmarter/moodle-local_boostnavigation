@@ -23,7 +23,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+require_once($CFG->dirroot . '/theme/legend/lib.php');
 /**
  * Fumble with Moodle's global navigation by leveraging Moodle's *_extend_navigation() hook.
  *
@@ -57,7 +57,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     }
 
     // Check if admin wanted us to remove the calendar node from Boost's nav drawer.
-    if (isset($config->removecalendarnode) && $config->removecalendarnode == true) {
+    if ((isset($config->removecalendarnode) && $config->removecalendarnode == true) || ($COURSE->id != SITEID)) {
         // If yes, do it.
         if ($calendarnode = $navigation->find('calendar', global_navigation::TYPE_CUSTOM)) {
             // Hide calendar node.
@@ -77,6 +77,9 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     // Next, we will need the mycourses node and the mycourses node children in any case and don't want to fetch them more
     // than once.
     $mycoursesnode = $navigation->find('mycourses', global_navigation::TYPE_ROOTNODE);
+
+    $mycoursesnode->icon = new pix_icon('i/courseevent', ''); //changing icon=
+
     $mycourseschildrennodeskeys = $mycoursesnode->get_children_key_list();
 
     // Check if admin wanted us to remove the mycourses node from Boost's nav drawer.
@@ -241,7 +244,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
                 $firstsectionnodekey = $firstsectionnode->key;
 
                 // Create coursesections course node.
-                $coursesectionsnode = navigation_node::create(get_string('sections', 'moodle'),
+                $coursesectionsnode = navigation_node::create(get_string('module_list', 'local_boostnavigation'),
                         new moodle_url('/course/view.php', array('id' => $COURSE->id)), // We have to add a URL to the course node,
                                                                                         // otherwise the node wouldn't be added to
                                                                                         // the flat navigation by Boost.
@@ -250,7 +253,10 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
                         global_navigation::TYPE_CUSTOM,
                         null,
                         'localboostnavigationcoursesections',
-                        null);
+                        null
+                        );
+
+                $coursesectionsnode->icon = new pix_icon('i/open', '');
                 // Prevent that the coursesections course node is marked as active and added to the breadcrumb when showing the
                 // course home page.
                 $coursesectionsnode->make_inactive();
@@ -599,6 +605,93 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
             user_preference_allow_ajax_update('local_boostnavigation-collapse_'.$node.'node', PARAM_BOOL);
         }
     }
+
+    // New admin requirements for new icon/styles/positions.
+    // @TODO - Add settings to covern this if need be.
+
+    /**********************
+     * Course-view settings
+    ***********************/
+
+    // Check if admin wanted us to remove participants from the current module.
+    if ($coursehomenode) {
+        $coursehomenode->children->remove('participants', navigation_node::TYPE_CONTAINER);
+    } else {
+        $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+        $coursehomenode->children->remove('participants', navigation_node::TYPE_CONTAINER);
+    }
+
+    // Change course-specific core grades text and icon
+    $gradesnode = $coursehomenode->children->find('grades', global_navigation::TYPE_SETTING);
+    if ($gradesnode) {
+        $gradesnode->text = get_string('my_grades', 'local_boostnavigation');
+        $gradesnode->icon = new pix_icon('t/award', 'award');
+    }
+
+    // Add calendar link after grades icon
+    $calendarnode = navigation_node::create(get_string('calendar', 'calendar'),
+        new moodle_url('/calendar/view.php', array('course' => $COURSE->id, 'view' => 'month')),
+        global_navigation::TYPE_CUSTOM,
+        null,
+        'calendar',
+        new pix_icon('i/calendar', '')
+    );
+    $coursehomenode->add_node($calendarnode, 'localboostnavigationcoursesections');
+    $calendarurlcheck = strpos($PAGE->url->out(), 'calendar/view.php?course=' . $COURSE->id);
+    if ($calendarurlcheck) {
+        $calendarnode->isactive = true;
+        // Marking the additional course node at the bottom as inactive.
+        $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+        $coursehomenode->isactive = false;
+    }
+
+    // Add full color folder icon to course section icons
+    if ($coursesectionsnode) {
+        $coursesectionnodes = $coursesectionsnode->parent->find_all_of_type(navigation_node::TYPE_SECTION);
+        if (count($coursesectionnodes)) {
+            foreach($coursesectionnodes as $node) {
+                $node->icon = new pix_icon('i/folder', '');
+            }
+        }
+    }
+
+    // Marking current module node active according url check
+    $currentmodulenode = $PAGE->navigation->find('current_module', global_navigation::TYPE_CUSTOM);
+    if ($currentmodulenode->text === get_string('current_module', 'local_boostnavigation') && $COURSE->id) {
+        // getting params for current module in active course
+        $currentsection = theme_legend_get_current_section($COURSE);
+        $courseviewurlcheck = strpos($PAGE->url->out(), 'course/view.php?id=' . $COURSE->id);
+        $sectionurlcheck = strpos($PAGE->url->out(), 'section=' . $currentsection['id']);
+
+        $currentmodulenode->isactive = ($courseviewurlcheck && $sectionurlcheck) ? true : false;
+    }
+
+    /********************
+     * Site-view settings
+    *********************/
+
+    // Add site-wide grade icon
+    $rootgradesnode = navigation_node::create(get_string('my_grades', 'local_boostnavigation'),
+        new moodle_url('/grade/report/overview/index.php'),
+        global_navigation::TYPE_CUSTOM,
+        null,
+        'root_grades',
+        new pix_icon('t/award', 'award')
+    );
+    $rootgradesnode->showinflatnavigation = $COURSE->id == SITEID ? true : false;
+    $navigation->add_node($rootgradesnode, 'home');
+
+    $homerootnode = navigation_node::create('Home',
+        new moodle_url('/'),
+        global_navigation::TYPE_CUSTOM,
+        null,
+        'home_root',
+        new pix_icon('i/home', 'home')
+    );
+    $homerootnode->showinflatnavigation = true;
+    $navigation->add_node($homerootnode, 'mycourses');
+
+    // End of new admin requirements for new icon/styles/positions.
 }
 
 
