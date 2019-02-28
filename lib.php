@@ -38,6 +38,9 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     // Include local library.
     require_once(__DIR__ . '/locallib.php');
 
+    $coursehomenode = false;
+    $coursesectionsnode = false;
+
     // Check if admin wanted us to remove the myhome node from Boost's nav drawer.
     // We have to check explicitely if the configurations are set because this function will already be
     // called at installation time and would then throw PHP notices otherwise.
@@ -656,7 +659,10 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     }
 
     // Marking current module node active according url check
-    $currentmodulenode = $PAGE->navigation->find('current_module', global_navigation::TYPE_CUSTOM);
+    if (isset($PAGE->navigation)) {
+        $currentmodulenode = $PAGE->navigation->find('current_module', global_navigation::TYPE_CUSTOM);
+    }
+    
     if ($currentmodulenode->text === get_string('current_module', 'local_boostnavigation') && $COURSE->id) {
         // getting params for current module in active course
         $currentsection = theme_legend_get_current_section($COURSE);
