@@ -167,3 +167,7 @@
 }
 /* End of new boost nav styles */
 
+#nav-drawer a[data-key="participants"] {
+    display: none !important;
+}
+

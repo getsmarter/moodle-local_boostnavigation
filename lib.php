@@ -616,14 +616,6 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
      * Course-view settings
     ***********************/
 
-    // Check if admin wanted us to remove participants from the current module.
-    if ($coursehomenode) {
-        $coursehomenode->children->remove('participants', navigation_node::TYPE_CONTAINER);
-    } else {
-        $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
-        $coursehomenode->children->remove('participants', navigation_node::TYPE_CONTAINER);
-    }
-
     // Change course-specific core grades text and icon
     $gradesnode = $coursehomenode->children->find('grades', global_navigation::TYPE_SETTING);
     if ($gradesnode) {
@@ -659,7 +651,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     }
 
     // Marking current module node active according url check
-    if (isset($PAGE->navigation)) {
+    if ($PAGE->navigation !== '') {
         $currentmodulenode = $PAGE->navigation->find('current_module', global_navigation::TYPE_CUSTOM);
     }
     
