@@ -624,20 +624,24 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     }
 
     // Add calendar link after grades icon
-    $calendarnode = navigation_node::create(get_string('calendar', 'calendar'),
-        new moodle_url('/calendar/view.php', array('course' => $COURSE->id, 'view' => 'month')),
-        global_navigation::TYPE_CUSTOM,
-        null,
-        'calendar',
-        new pix_icon('i/calendar', '')
-    );
-    $coursehomenode->add_node($calendarnode, 'localboostnavigationcoursesections');
-    $calendarurlcheck = strpos($PAGE->url->out(), 'calendar/view.php?course=' . $COURSE->id);
-    if ($calendarurlcheck) {
-        $calendarnode->isactive = true;
-        // Marking the additional course node at the bottom as inactive.
-        $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
-        $coursehomenode->isactive = false;
+    $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+    if(empty($coursehomenode)) {
+
+        $calendarnode = navigation_node::create(get_string('calendar', 'calendar'),
+            new moodle_url('/calendar/view.php', array('course' => $COURSE->id, 'view' => 'month')),
+            global_navigation::TYPE_CUSTOM,
+            null,
+            'calendar',
+            new pix_icon('i/calendar', '')
+        );
+        $coursehomenode->add_node($calendarnode, 'localboostnavigationcoursesections');
+        $calendarurlcheck = strpos($PAGE->url->out(), 'calendar/view.php?course=' . $COURSE->id);
+        if ($calendarurlcheck) {
+            $calendarnode->isactive = true;
+            // Marking the additional course node at the bottom as inactive.
+            $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+            $coursehomenode->isactive = false;
+        }
     }
 
     // Add full color folder icon to course section icons
