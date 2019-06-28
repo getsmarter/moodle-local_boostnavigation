@@ -659,9 +659,14 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     if(!empty($currentmodulenode)) {
         if ($currentmodulenode->text === get_string('current_module', 'local_boostnavigation') && $COURSE->id) {
             // getting params for current module in active course
+            $sectionurlcheck = false;
+
             $currentsection = theme_legend_get_current_section($COURSE);
             $courseviewurlcheck = strpos($PAGE->url->out(), 'course/view.php?id=' . $COURSE->id);
-            $sectionurlcheck = strpos($PAGE->url->out(), 'section=' . $currentsection['id']);
+
+            if (isset($currentsection['id'])) {
+                $sectionurlcheck = strpos($PAGE->url->out(), 'section=' . $currentsection['id']);
+            }
 
             $currentmodulenode->isactive = ($courseviewurlcheck && $sectionurlcheck) ? true : false;
         }
