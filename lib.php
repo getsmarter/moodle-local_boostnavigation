@@ -625,14 +625,16 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
 
     // Add calendar link after grades icon
     $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
-    $calendarnode = navigation_node::create(get_string('calendar', 'calendar'),
+    if (array_search('calendar', $coursehomenode->get_children_key_list()) === false) {
+        $calendarnode = navigation_node::create(get_string('calendar', 'calendar'),
         new moodle_url('/calendar/view.php', array('course' => $COURSE->id, 'view' => 'month')),
         global_navigation::TYPE_CUSTOM,
         null,
         'calendar',
         new pix_icon('i/calendar', '')
-    );
-    $coursehomenode->add_node($calendarnode, 'localboostnavigationcoursesections');
+        );
+        $coursehomenode->add_node($calendarnode, 'localboostnavigationcoursesections');
+    }
     $calendarurlcheck = strpos($PAGE->url->out(), 'calendar/view.php?course=' . $COURSE->id);
     if ($calendarurlcheck) {
         $calendarnode->isactive = true;
