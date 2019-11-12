@@ -253,6 +253,10 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                             $customnode->icon = new pix_icon('t/addcontact', 'addcontact');
                             $customnode->text = get_string('support_team', 'local_boostnavigation');
                             break;
+                        case 'student_appeals':
+                            $customnode->icon = new image_icon('t/wpforms', 'fa-wpforms');
+                            $customnode->text = get_string('student_appeals', 'local_boostnavigation');
+                            break;
                         case 'classmates':
                             $customnode->icon = new pix_icon('t/cohort', 'cohort');
                             $customnode->text = get_string('classmates', 'local_boostnavigation');

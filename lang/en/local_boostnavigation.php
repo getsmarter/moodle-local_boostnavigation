@@ -193,3 +193,4 @@ $string['announcements_and_resources'] = 'Announcements and resources';
 $string['current_module'] = 'Current module';
 $string['my_grades'] = 'My grades';
 $string['module_list'] = 'Module list';
+$string['student_appeals'] = 'Submit an appeal';
