@@ -23,6 +23,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot.'/blocks/student_appeals/classes/appeals/appeal.php');
 
 /**
  * Moodle core does not have a built-in functionality to get all keys of all children of a navigation node,
@@ -55,7 +56,6 @@ function local_boostnavigation_get_all_childrenkeys(navigation_node $navigationn
     }
 }
 
-
 /**
  * This function takes the plugin's custom nodes setting, builds the custom nodes and adds them to the given navigation_node.
  *
@@ -66,11 +66,13 @@ function local_boostnavigation_get_all_childrenkeys(navigation_node $navigationn
  * @param bool $collapse
  * @param bool $collapsedefault
  * @return array
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function local_boostnavigation_build_custom_nodes($customnodes, navigation_node $node,
         $keyprefix='localboostnavigationcustom', $showinflatnavigation=true, $collapse=false,
         $collapsedefault=false) {
-    global $USER;
+    global $PAGE, $USER, $DB;
 
     // Initialize counter which is later used for the node IDs.
     $nodecount = 0;
@@ -111,76 +113,20 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
         // If array contains too less or too many settings, do not proceed and therefore do not create the node.
         // Furthermore check it at least the first two mandatory params are not an empty string.
         if (count($settings) >= 2 && count($settings) <= 5 && $settings[0] !== '' && $settings[1] !== '') {
-            foreach ($settings as $i => $setting) {
-                $setting = trim($setting);
-                if (!empty($setting)) {
-                    switch ($i) {
-                        // Check for the mandatory first param: title.
-                        case 0:
-                            // Check if this is a child node and get the node title.
-                            if (substr($setting, 0, 1) == '-') {
-                                $nodeischild = true;
-                                $nodetitle = substr($setting, 1);
-                            } else {
-                                $nodeischild = false;
-                                $nodetitle = $setting;
-                            }
+            list($nodeischild,
+                $nodetitle,
+                $nodevisible,
+                $nodeurl) = checkManditoryParameters($settings, $nodevisible, $USER, $lastparentnodevisible);
+        }
 
-                            // Set the node to be basically visible.
-                            $nodevisible = true;
-
-                            break;
-                        // Check for the mandatory second param: URL.
-                        case 1:
-                            // Get the URL.
-                            try {
-                                $nodeurl = local_boostnavigation_build_node_url($setting);
-                                $nodevisible = true;
-                            } catch (moodle_exception $exception) {
-                                // We're not actually worried about this, we don't want to mess up the navigation
-                                // just for a wrongly entered URL. We just don't create a node in this case.
-                                $nodeurl = null;
-                                $nodevisible = false;
-                            }
-
-                            break;
-                        // Check for the optional third param: language support.
-                        case 2:
-                            // Only proceed if something is entered here. This parameter is optional.
-                            // If no language is given the node will be added to the navigation by default.
-                            $nodelanguages = array_map('trim', explode(',', $setting));
-                            $nodevisible &= in_array(current_language(), $nodelanguages);
-
-                            break;
-                        // Check for the optional fourth param: cohort filter.
-                        case 3:
-                            // Only proceed if something is entered here. This parameter is optional.
-                            // If no cohort is given the node will be added to the navigation by default.
-                            $nodevisible &= local_boostnavigation_cohort_is_member($USER->id, $setting);
-
-                            break;
-                        // Check for the optional fifth parameter: role filter.
-                        case 4:
-                            // Only proceed if some role is entered here. This parameter is optional.
-                            // If no role shortnames are given, the node will be added to the navigation by default.
-                            // Otherwise, it is checked whether the user has any of the provided roles,
-                            // so that the custom node is displayed.
-                            $nodevisible &= local_boostnavigation_user_has_role_on_page($USER->id, $setting);
-
-                            break;
-                    }
-
-                    // Support for inheritance of the parent node's visibility to his child notes.
-                    if ($nodeischild == false) {
-                        // To inherit the parent node's visibility to his child nodes later, we have to remember
-                        // this visibility now.
-                        $lastparentnodevisible = $nodevisible;
-                    } else {
-                        // Inherit the parent node's visibility. This overrules the child node's visibility.
-                        $nodevisible &= $lastparentnodevisible;
-                    }
-
-                }
+        // Change visibility to false if user is not allowed to make appeal.
+        if ($nodetitle === 'student_appeals') {
+            $nodevisible = false;
+            $appeal = new appeal($PAGE->course->id, $USER->id, null, null, $DB, null);
+            $config = get_config('block_student_appeals');
+            $appealResponse = $appeal->canMakeAppeal($config);
+            if (is_object($appealResponse) && $appealResponse->response === 200) {
+                $nodevisible = true;
             }
         }
 
@@ -242,44 +188,7 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 // Finally, if the node shouldn't be collapsed or if it does not have children, set the node icon.
                 if (!$collapse || $customnode->has_children() == false) {
                     $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
-
-                    // Handle custom node icons, language names and hrefs where applicable.
-                    switch (strtolower($customnode->text)) {
-                        case 'progress':
-                            $customnode->icon = new pix_icon('i/dashboard', 'dashboard');
-                            $customnode->text = get_string('progress', 'local_boostnavigation');
-                            break;
-                        case 'support_team':
-                            $customnode->icon = new pix_icon('t/addcontact', 'addcontact');
-                            $customnode->text = get_string('support_team', 'local_boostnavigation');
-                            break;
-                        case 'student_appeals':
-                            $customnode->icon = new image_icon('t/wpforms', 'fa-wpforms');
-                            $customnode->text = get_string('student_appeals', 'local_boostnavigation');
-                            break;
-                        case 'classmates':
-                            $customnode->icon = new pix_icon('t/cohort', 'cohort');
-                            $customnode->text = get_string('classmates', 'local_boostnavigation');
-                            break;
-                        case 'announcements_and_resources':
-                            $customnode->icon = new pix_icon('i/flagged', 'flagged');
-                            $customnode->text = get_string('announcements_and_resources', 'local_boostnavigation');
-                            break;
-                        case 'current_module':
-                            $courseid = $customnode->action->get_param('id');
-                            $customnode->key = "current_module";
-                            // Working out selected module's current module and section in url
-                            if ($courseid) {
-                                $course = get_course($courseid);
-                                $currentsection = theme_legend_get_current_section($course);
-                                $customnode->action->param('section', $currentsection['id']);
-                            }
-                            $customnode->icon = new pix_icon('i/star-rating1', 'star-rating');
-                            $customnode->text = get_string('current_module', 'local_boostnavigation');
-                            break;
-                        default:
-                            break;
-                    }
+                    customNodeContent($customnode);
                 }
 
                 // Otherwise, if it's a child node.
@@ -322,6 +231,134 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
 
     // Return the node keys for collapsing.
     return $collapsenodesforjs;
+}
+
+/**
+ * @param array $settings
+ * @param bool $nodevisible
+ * @param $USER
+ * @param bool $lastparentnodevisible
+ * @return array
+ */
+function checkManditoryParameters(array $settings, bool $nodevisible, $USER, bool $lastparentnodevisible): array {
+    foreach ($settings as $i => $setting) {
+        $setting = trim($setting);
+        if (!empty($setting)) {
+            switch ($i) {
+                // Check for the mandatory first param: title.
+                case 0:
+                    // Check if this is a child node and get the node title.
+                    if (substr($setting, 0, 1) == '-') {
+                        $nodeischild = true;
+                        $nodetitle = substr($setting, 1);
+                    } else {
+                        $nodeischild = false;
+                        $nodetitle = $setting;
+                    }
+
+                    // Set the node to be basically visible.
+                    $nodevisible = true;
+
+                    break;
+                // Check for the mandatory second param: URL.
+                case 1:
+                    // Get the URL.
+                    try {
+                        $nodeurl = local_boostnavigation_build_node_url($setting);
+                        $nodevisible = true;
+                    } catch (moodle_exception $exception) {
+                        // We're not actually worried about this, we don't want to mess up the navigation
+                        // just for a wrongly entered URL. We just don't create a node in this case.
+                        $nodeurl = null;
+                        $nodevisible = false;
+                    }
+
+                    break;
+                // Check for the optional third param: language support.
+                case 2:
+                    // Only proceed if something is entered here. This parameter is optional.
+                    // If no language is given the node will be added to the navigation by default.
+                    $nodelanguages = array_map('trim', explode(',', $setting));
+                    $nodevisible &= in_array(current_language(), $nodelanguages);
+
+                    break;
+                // Check for the optional fourth param: cohort filter.
+                case 3:
+                    // Only proceed if something is entered here. This parameter is optional.
+                    // If no cohort is given the node will be added to the navigation by default.
+                    $nodevisible &= local_boostnavigation_cohort_is_member($USER->id, $setting);
+
+                    break;
+                // Check for the optional fifth parameter: role filter.
+                case 4:
+                    // Only proceed if some role is entered here. This parameter is optional.
+                    // If no role shortnames are given, the node will be added to the navigation by default.
+                    // Otherwise, it is checked whether the user has any of the provided roles,
+                    // so that the custom node is displayed.
+                    $nodevisible &= local_boostnavigation_user_has_role_on_page($USER->id, $setting);
+
+                    break;
+            }
+
+            // Support for inheritance of the parent node's visibility to his child notes.
+            if ($nodeischild == false) {
+                // To inherit the parent node's visibility to his child nodes later, we have to remember
+                // this visibility now.
+                $lastparentnodevisible = $nodevisible;
+            } else {
+                // Inherit the parent node's visibility. This overrules the child node's visibility.
+                $nodevisible &= $lastparentnodevisible;
+            }
+
+        }
+    }
+    return [$nodeischild, $nodetitle, $nodevisible, $nodeurl];
+}
+
+/**
+ * Handle custom node icons, language names and hrefs where applicable.
+ *
+ * @param navigation_node $customnode
+ * @throws coding_exception
+ * @throws dml_exception
+ */
+function customNodeContent(navigation_node $customnode) {
+    switch (strtolower($customnode->text)) {
+        case 'progress':
+            $customnode->icon = new pix_icon('i/dashboard', 'dashboard');
+            $customnode->text = get_string('progress', 'local_boostnavigation');
+            break;
+        case 'support_team':
+            $customnode->icon = new pix_icon('t/addcontact', 'addcontact');
+            $customnode->text = get_string('support_team', 'local_boostnavigation');
+            break;
+        case 'student_appeals':
+            $customnode->icon = new image_icon('t/wpforms', 'fa-wpforms');
+            $customnode->text = get_string('student_appeals', 'local_boostnavigation');
+            break;
+        case 'classmates':
+            $customnode->icon = new pix_icon('t/cohort', 'cohort');
+            $customnode->text = get_string('classmates', 'local_boostnavigation');
+            break;
+        case 'announcements_and_resources':
+            $customnode->icon = new pix_icon('i/flagged', 'flagged');
+            $customnode->text = get_string('announcements_and_resources', 'local_boostnavigation');
+            break;
+        case 'current_module':
+            $courseid = $customnode->action->get_param('id');
+            $customnode->key = "current_module";
+            // Working out selected module's current module and section in url
+            if ($courseid) {
+                $course = get_course($courseid);
+                $currentsection = theme_legend_get_current_section($course);
+                $customnode->action->param('section', $currentsection['id']);
+            }
+            $customnode->icon = new pix_icon('i/star-rating1', 'star-rating');
+            $customnode->text = get_string('current_module', 'local_boostnavigation');
+            break;
+        default:
+            break;
+    }
 }
 
 /**
