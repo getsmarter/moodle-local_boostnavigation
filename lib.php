@@ -610,47 +610,51 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     }
 
     // New admin requirements for new icon/styles/positions.
-    // @TODO - Add settings to covern this if need be.
+    // @TODO - Add settings to govern this if need be.
 
     /**********************
      * Course-view settings
     ***********************/
 
-    // Change course-specific core grades text and icon
-    $gradesnode = $coursehomenode->children->find('grades', global_navigation::TYPE_SETTING);
-    if ($gradesnode) {
-        $gradesnode->text = get_string('my_grades', 'local_boostnavigation');
-        $gradesnode->icon = new pix_icon('t/award', 'award');
-    }
-
-    // Add calendar link after grades icon
-    $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
-    if (array_search('calendar', $coursehomenode->get_children_key_list()) === false) {
-        $calendarnode = navigation_node::create(get_string('calendar', 'calendar'),
-        new moodle_url('/calendar/view.php', array('course' => $COURSE->id, 'view' => 'month')),
-        global_navigation::TYPE_CUSTOM,
-        null,
-        'calendar',
-        new pix_icon('i/calendar', '')
-        );
-        $coursehomenode->add_node($calendarnode, 'localboostnavigationcoursesections');
-    }
-    $calendarurlcheck = strpos($PAGE->url->out(), 'calendar/view.php?course=' . $COURSE->id);
-    if ($calendarurlcheck) {
-        $calendarnode->isactive = true;
-        // Marking the additional course node at the bottom as inactive.
-        $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
-        $coursehomenode->isactive = false;
-    }
-
-    // Add full color folder icon to course section icons
-    if ($coursesectionsnode) {
-        $coursesectionnodes = $coursesectionsnode->parent->find_all_of_type(navigation_node::TYPE_SECTION);
-        if (count($coursesectionnodes)) {
-            foreach($coursesectionnodes as $node) {
-                $node->icon = new pix_icon('i/folder', '');
-            }
+    try {
+        // Change course-specific core grades text and icon
+        $gradesnode = $coursehomenode->children->find('grades', global_navigation::TYPE_SETTING);
+        if ($gradesnode) {
+            $gradesnode->text = get_string('my_grades', 'local_boostnavigation');
+            $gradesnode->icon = new pix_icon('t/award', 'award');
         }
+
+        // Add calendar link after grades icon
+        $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+        if (array_search('calendar', $coursehomenode->get_children_key_list()) === false) {
+            $calendarnode = navigation_node::create(get_string('calendar', 'calendar'),
+            new moodle_url('/calendar/view.php', array('course' => $COURSE->id, 'view' => 'month')),
+            global_navigation::TYPE_CUSTOM,
+            null,
+            'calendar',
+            new pix_icon('i/calendar', '')
+            );
+            $coursehomenode->add_node($calendarnode, 'localboostnavigationcoursesections');
+        }
+        $calendarurlcheck = strpos($PAGE->url->out(), 'calendar/view.php?course=' . $COURSE->id);
+        if ($calendarurlcheck) {
+            $calendarnode->isactive = true;
+            // Marking the additional course node at the bottom as inactive.
+            $coursehomenode = $PAGE->navigation->find($COURSE->id, navigation_node::TYPE_COURSE);
+            $coursehomenode->isactive = false;
+        }
+
+        // Add full color folder icon to course section icons
+        if ($coursesectionsnode) {
+            $coursesectionnodes = $coursesectionsnode->parent->find_all_of_type(navigation_node::TYPE_SECTION);
+            if (count($coursesectionnodes)) {
+                foreach($coursesectionnodes as $node) {
+                    $node->icon = new pix_icon('i/folder', '');
+                }
+            }
+        }        
+    } catch (Exception $e) {
+        error_log($e);
     }
 
     // Marking current module node active according url check
