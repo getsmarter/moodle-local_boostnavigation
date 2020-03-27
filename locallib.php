@@ -23,7 +23,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot.'/blocks/student_appeals/classes/appeals/appeal.php');
 
 /**
  * Moodle core does not have a built-in functionality to get all keys of all children of a navigation node,
@@ -117,17 +116,6 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 $nodetitle,
                 $nodevisible,
                 $nodeurl) = checkManditoryParameters($settings, $nodevisible, $USER, $lastparentnodevisible);
-        }
-
-        // Change visibility to false if user is not allowed to make appeal.
-        if ($nodetitle === 'student_appeals') {
-            $nodevisible = false;
-            $appeal = new appeal($PAGE->course->id, $USER->id, null, null, $DB, null);
-            $config = get_config('block_student_appeals');
-            $appealResponse = $appeal->canMakeAppeal($config);
-            if (is_object($appealResponse) && $appealResponse->response === 200) {
-                $nodevisible = true;
-            }
         }
 
         // Add a custom node to the given navigation_node.
@@ -331,10 +319,6 @@ function customNodeContent(navigation_node $customnode) {
         case 'support_team':
             $customnode->icon = new pix_icon('t/addcontact', 'addcontact');
             $customnode->text = get_string('support_team', 'local_boostnavigation');
-            break;
-        case 'student_appeals':
-            $customnode->icon = new image_icon('t/wpforms', 'fa-wpforms');
-            $customnode->text = get_string('student_appeals', 'local_boostnavigation');
             break;
         case 'classmates':
             $customnode->icon = new pix_icon('t/cohort', 'cohort');
