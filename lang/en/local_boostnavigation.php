@@ -187,7 +187,7 @@ $string['settingspage_bottomnodes'] = 'Bottom nodes';
 
 // Custom node settings
 $string['progress'] = 'Progress';
-$string['support_team'] = 'Contact Support team';
+$string['support_team'] = 'Contact Support Team';
 $string['classmates'] = 'Classmates';
 $string['announcements_and_resources'] = 'Announcements and resources';
 $string['current_module'] = 'Current module';
