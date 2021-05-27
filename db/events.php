@@ -15,20 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Local plugin "Boost navigation fumbling" - Version file
+ * Local plugin "Boost navigation fumbling" - Event handlers
  *
  * @package    local_boostnavigation
- * @copyright  2017 Alexander Bias, Ulm University <alexander.bias@uni-ulm.de>
+ * @copyright  2019 Alexander Bias, Ulm University <alexander.bias@uni-ulm.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_boostnavigation';
-$plugin->version = 2020120902;
-$plugin->release = 'v3.10-r3';
-$plugin->requires = 2020110900;
-$plugin->supported = [310, 310];
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = array('theme_boost' => 2020110900,
-                              'block_myoverview' => 2020110900);
+$observers = [
+        [
+                'eventname' => '\core\event\user_loggedin',
+                'callback' => '\local_boostnavigation\eventobservers::user_loggedin'
+        ],
+        [
+                'eventname' => '\core\event\user_loggedout',
+                'callback' => '\local_boostnavigation\eventobservers::user_loggedout'
+        ],
+];
