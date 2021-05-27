@@ -72,9 +72,12 @@ function local_boostnavigation_get_all_childrenkeys(navigation_node $navigationn
 function local_boostnavigation_build_custom_nodes($customnodes, navigation_node $node,
         $keyprefix='localboostnavigationcustom', $showinflatnavigation=true, $collapse=false,
 <<<<<<< HEAD
+<<<<<<< HEAD
         $collapsedefault=false) {
     global $PAGE, $USER, $DB;
 =======
+=======
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
         $collapsedefault=false, $accordion=false) {
     global $USER, $FULLME;
 
@@ -85,6 +88,9 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
     if (!empty($FULLME)) {
         $pagefullurl = new moodle_url($FULLME);
     }
+<<<<<<< HEAD
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
+=======
 >>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
 
     // Initialize counter which is later used for the node IDs.
@@ -143,12 +149,15 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
         // If array contains too less or too many settings, do not proceed and therefore do not create the node.
         // Furthermore check it at least the first two mandatory params are not an empty string.
 <<<<<<< HEAD
+<<<<<<< HEAD
         if (count($settings) >= 2 && count($settings) <= 5 && $settings[0] !== '' && $settings[1] !== '') {
             list($nodeischild,
                 $nodetitle,
                 $nodevisible,
                 $nodeurl) = checkManditoryParameters($settings, $nodevisible, $USER, $lastparentnodevisible);
 =======
+=======
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
         if (count($settings) >= 2 && count($settings) <= 11 && $settings[0] !== '' && $settings[1] !== '') {
             foreach ($settings as $i => $setting) {
                 $setting = trim($setting);
@@ -308,6 +317,19 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 }
             } else if (count($logicalcombinationstack) == 1) {
                 $nodevisible &= $logicalcombinationstack[0];
+<<<<<<< HEAD
+=======
+            }
+
+            // Support for inheritance of the parent node's visibility to his child notes.
+            if ($nodeischild == false) {
+                // To inherit the parent node's visibility to his child nodes later, we have to remember
+                // this visibility now.
+                $lastparentnodevisible = $nodevisible;
+            } else {
+                // Inherit the parent node's visibility. This overrules the child node's visibility.
+                $nodevisible &= $lastparentnodevisible;
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
             }
 
             // Support for inheritance of the parent node's visibility to his child notes.
@@ -377,6 +399,9 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
 =======
                 // Add the custom node to the given navigation_node.
                 $targetnode->add_node($customnode, $nodebeforenodekey);
+<<<<<<< HEAD
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
+=======
 >>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
 
                 // Remember the node as a potential parent node for the next node.
@@ -425,11 +450,14 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                 // Finally, if the node shouldn't be collapsed or if it does not have children, set the node icon.
                 if (!$collapse || $customnode->has_children() == false) {
                     $customnode->icon = new pix_icon('customnode', '', 'local_boostnavigation');
                     customNodeContent($customnode);
 =======
+=======
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
                 // Finally, set the node icon.
                 // This covers the case that the node should not be collapsed
                 // as well as the case that the node should not be collapsed but does not have any children.
@@ -438,6 +466,9 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                     $customnode->icon = $nodeicon;
                 } else {
                     $customnode->icon = new pix_icon('customnodexs', '', 'local_boostnavigation');
+<<<<<<< HEAD
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
+=======
 >>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
                 }
 

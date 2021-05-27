@@ -63,6 +63,7 @@
     cursor: pointer;
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 /* Custom nodes feature. */
 /* Add an indent to the custom child nodes because this isn't possible with Navigation node API.
@@ -91,6 +92,11 @@
 /* ... and remove the indent of the mycourses child nodes. */
 .list-group-item[data-parent-key="mycourses"] > div {
     margin-left: 0 !important;
+=======
+/* Remove the indent of the collapsible custom child nodes. */
+.jsenabled .list-group-item.localboostnavigationcollapsiblechild > div {
+    margin-left: inherit !important;
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
 =======
 /* Remove the indent of the collapsible custom child nodes. */
 .jsenabled .list-group-item.localboostnavigationcollapsiblechild > div {

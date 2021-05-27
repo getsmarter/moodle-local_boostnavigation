@@ -36,6 +36,9 @@ define('LOCAL_BOOSTNAVIGATION_MOVEBEFORE_GRADES', 'grades');
 define('LOCAL_BOOSTNAVIGATION_MOVEBEFORE_BADGES', 'badgesview');
 define('LOCAL_BOOSTNAVIGATION_MOVEBEFORE_COMPETENCIES', 'competencies');
 
+<<<<<<< HEAD
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
+=======
 >>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
 /**
  * Fumble with Moodle's global navigation by leveraging Moodle's *_extend_navigation() hook.
@@ -523,10 +526,15 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
                         null,
                         'localboostnavigationcoursesections',
 <<<<<<< HEAD
+<<<<<<< HEAD
                         null
                         );
 
                 $coursesectionsnode->icon = new pix_icon('i/open', '');
+=======
+                        new pix_icon('i/folder', ''));
+
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
 =======
                         new pix_icon('i/folder', ''));
 

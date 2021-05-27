@@ -189,6 +189,7 @@ $string['setting_removerootnodestechnicalhint'] = 'Technical background: This is
 $string['setting_removeselectedhomerootnodeexplanation'] = 'The selected Home / Dashboard node is defined by what the user chose to be his home page.';
 $string['settingspage_bottomnodes'] = 'Bottom nodes';
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 // Custom node settings
 $string['progress'] = 'Progress';
@@ -200,10 +201,15 @@ $string['my_grades'] = 'My grades';
 $string['module_list'] = 'Module list';
 $string['student_appeals'] = 'Submit an appeal';
 =======
+=======
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
 $string['settingspage_coursenodes'] = 'Course nodes';
 $string['settingspage_custombottomnodes'] = 'Custom bottom nodes';
 $string['settingspage_customcoursenodes'] = 'Custom course nodes';
 $string['settingspage_customrootnodes'] = 'Custom root nodes';
 $string['settingspage_mycoursesrootnode'] = 'My courses root node';
 $string['settingspage_rootnodes'] = 'Root nodes';
+<<<<<<< HEAD
+>>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
+=======
 >>>>>>> b150ea9a983c2c46cfcc74f26db42518c7d497fe
