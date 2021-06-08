@@ -693,7 +693,7 @@ function local_boostnavigation_extend_navigation(global_navigation $navigation) 
     $rootgradesnode->showinflatnavigation = $COURSE->id == SITEID ? true : false;
     $navigation->add_node($rootgradesnode, 'home');
 
-    $homerootnode = navigation_node::create('Home',
+    $homerootnode = navigation_node::create(get_string('home', 'local_boostnavigation'),
         new moodle_url('/'),
         global_navigation::TYPE_CUSTOM,
         null,
