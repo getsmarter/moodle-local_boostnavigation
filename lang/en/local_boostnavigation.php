@@ -184,6 +184,7 @@ $string['setting_removesecondhomenode'] = 'Remove second "Home" or "Dashboard" n
 $string['settingspage_rootnodes'] = 'Root nodes';
 $string['settingspage_coursenodes'] = 'Course nodes';
 $string['settingspage_bottomnodes'] = 'Bottom nodes';
+$string['home'] = 'Home';
 
 // Custom node settings
 $string['progress'] = 'Progress';
